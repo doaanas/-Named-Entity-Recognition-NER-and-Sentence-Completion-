@@ -1,5 +1,10 @@
 import streamlit as st
-from transformers import BertTokenizer, BertForMaskedLM, pipeline, BertForTokenClassification
+from transformers import (
+    BertTokenizer,
+    BertForMaskedLM,
+    pipeline,
+    BertForTokenClassification
+)
 
 # Load models
 ner_model_name = "dbmdz/bert-large-cased-finetuned-conll03-english"
@@ -30,9 +35,12 @@ if task == "Named Entity Recognition":
     if st.button("Identify Entities"):
         if user_input:
             entities = ner_pipeline(user_input)
-            st.write("### Identified Entities:")
-            for entity in entities:
-                st.write(f"**Entity**: `{entity['word']}`, **Type**: `{entity['entity']}`, **Score**: `{entity['score']:.4f}`")
+            if entities:
+                st.write("### Identified Entities:")
+                for entity in entities:
+                    st.write(f"**Entity**: `{entity['word']}`, **Type**: `{entity['entity']}`, **Score**: `{entity['score']:.4f}`")
+            else:
+                st.write("No entities identified.")
         else:
             st.warning("Please enter some text for entity recognition.")
 
@@ -50,4 +58,13 @@ elif task == "Sentence Completion":
             for completion in completions:
                 st.write(f"**Suggestion**: `{completion['sequence']}`, **Score**: `{completion['score']:.4f}`")
         else:
-            st.warning("Please make sure your sentence contains a [MASK] token.")
+            st.warning("Please make sure your sentence contains a `[MASK]` token.")
+
+# Footer with additional info
+st.markdown("---")
+st.write("### About This App")
+st.write(
+    "This application uses BERT models for two main tasks: Named Entity Recognition (NER) "
+    "and Sentence Completion. The NER model identifies entities in the text, while the "
+    "Sentence Completion model predicts missing words in a sentence."
+)
