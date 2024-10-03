@@ -17,31 +17,22 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10.12'
+        python-version: '3.10.12'  # Adjust Python version if necessary
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install streamlit transformers torch pyngrok
-
-    - name: Authenticate with Ngrok
-      run: |
-        echo 2mhQV1wAiIYK35sfVMN2qT2PUoc_852LFF1mGbxpaJatrgjfn > ~/.ngrok_token
-        pyngrok authtoken 2mhQV1wAiIYK35sfVMN2qT2PUoc_852LFF1mGbxpaJatrgjfn
+        pip install streamlit transformers torch
 
     - name: Run Streamlit app
       run: |
-        ngrok authtoken 2mhQV1wAiIYK35sfVMN2qT2PUoc_852LFF1mGbxpaJatrgjfn
-        streamlit run NER.py --server.port 8501
+        streamlit run your_script_name.py --server.port 8501 > streamlit_output.log 2>&1 &
+        sleep 10  # Wait for Streamlit to start up
 
-    - name: Trigger GitHub Action
+    - name: Check Streamlit logs
       run: |
-        curl -X POST \
-        -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-        -H "Accept: application/vnd.github.v3+json" \
-        https://api.github.com/repos/${{ github.repository }}/actions/workflows/deploy.yml/dispatches \
-        -d '{"ref": "main"}'
+        cat streamlit_output.log
 
     - name: Notify URL
       run: |
-        echo "Streamlit app is live at $(curl --silent http://localhost:4040/api/tunnels | jq .tunnels[0].public_url)"
+        echo "Streamlit app should be live at http://localhost:8501"
